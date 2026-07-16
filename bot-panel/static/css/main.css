@@ -1269,9 +1269,27 @@ body {
 
 /* ── Responsive ──────────────────────────────── */
 @media (max-width: 768px) {
-  .sidebar { transform: translateX(-100%); }
+  .sidebar {
+    transform: translateX(-100%);
+    z-index: 300;
+    position: fixed;
+    top: 0; left: 0;
+    height: 100dvh;
+    transition: transform 0.25s ease;
+  }
   .sidebar.open { transform: translateX(0); }
   .main-wrapper { margin-left: 0; }
+
+  /* Backdrop oscuro detrás del sidebar */
+  .sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 299;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .sidebar-backdrop.active { display: block; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .settings-grid { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }

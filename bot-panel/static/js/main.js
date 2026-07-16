@@ -29,6 +29,19 @@ function showToast(message, type = 'info', duration = 3500) {
 const sidebar = document.getElementById('sidebar');
 const sidebarToggle = document.getElementById('sidebarToggle');
 const mobileSidebarToggle = document.getElementById('mobileSidebarToggle');
+const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+function openMobileSidebar() {
+    sidebar?.classList.add('open');
+    sidebarBackdrop?.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeMobileSidebar() {
+    sidebar?.classList.remove('open');
+    sidebarBackdrop?.classList.remove('active');
+    document.body.style.overflow = '';
+}
 
 if (sidebarToggle) {
     sidebarToggle.addEventListener('click', () => {
@@ -36,18 +49,20 @@ if (sidebarToggle) {
     });
 }
 if (mobileSidebarToggle) {
-    mobileSidebarToggle.addEventListener('click', () => {
-        sidebar?.classList.toggle('open');
+    mobileSidebarToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sidebar?.classList.contains('open') ? closeMobileSidebar() : openMobileSidebar();
     });
 }
 
-// Close sidebar on outside click (mobile)
-document.addEventListener('click', (e) => {
-    if (sidebar?.classList.contains('open') &&
-        !sidebar.contains(e.target) &&
-        e.target !== mobileSidebarToggle) {
-        sidebar.classList.remove('open');
-    }
+// Backdrop toca → cierra
+sidebarBackdrop?.addEventListener('click', closeMobileSidebar);
+
+// Nav links dentro del sidebar → navegar y cerrar
+sidebar?.querySelectorAll('.nav-item').forEach(link => {
+    link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) closeMobileSidebar();
+    });
 });
 
 // ── Auto-refresh bot status in sidebar ─────────
