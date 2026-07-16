@@ -24,13 +24,13 @@ args = "Bot Panel"
 name = "Bot Panel"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd bot-panel && pip install -r requirements.txt -q && python app.py"
-waitForPort = 5000
-
 [workflows.workflow.metadata]
 outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd bot-panel && python app.py"
+waitForPort = 5000
 
 [agent]
 stack = "PNPM_WORKSPACE"
