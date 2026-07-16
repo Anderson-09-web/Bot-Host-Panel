@@ -9,10 +9,25 @@ _log_buffer: deque[dict] = deque(maxlen=500)
 _lock = Lock()
 
 
+# Mensajes de werkzeug/sistema que no deben aparecer en la consola del panel
+_NOISE_PATTERNS = (
+    "Debugger PIN",
+    "Debugger is active",
+    "WARNING: This is a development server",
+    "Use a production WSGI server",
+    " * Running on",
+    " * Restarting with",
+    " * Detected change in",
+)
+
+
 class PanelLogHandler(logging.Handler):
     """Handler que captura logs y los almacena en buffer + BD."""
 
     def emit(self, record: logging.LogRecord):
+        msg = record.getMessage()
+        if any(pat in msg for pat in _NOISE_PATTERNS):
+            return  # silenciar ruido interno de werkzeug
         entry = {
             "level": record.levelname,
             "source": record.name,

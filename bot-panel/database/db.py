@@ -17,7 +17,7 @@ def init_db(app):
     db.init_app(app)
     with app.app_context():
         # Importar todos los modelos antes de crear tablas
-        from models import user, bot_config, log_entry, lavalink_config, panel_config  # noqa: F401
+        from models import user, bot_config, log_entry, lavalink_config, panel_config, env_variable  # noqa: F401
         db.create_all()
         _seed_defaults(app)
 

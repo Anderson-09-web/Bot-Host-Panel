@@ -97,4 +97,5 @@ if __name__ == "__main__":
         port=Config.PORT,
         debug=Config.DEBUG,
         use_reloader=False,
+        use_debugger=False,   # evita el PIN del debugger en consola
     )
