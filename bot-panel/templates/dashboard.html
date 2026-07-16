@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Bot Panel{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Bot Info Banner -->
+<div class="bot-banner" id="botBanner">
+    <div class="bot-avatar-wrap">
+        <img src="" id="botAvatar" class="bot-avatar" alt="Bot" onerror="this.style.display='none'">
+        <div class="bot-avatar-fallback" id="botAvatarFallback">
+            <i class="fa-brands fa-discord"></i>
+        </div>
+        <span class="status-indicator offline" id="bannerStatusDot"></span>
+    </div>
+    <div class="bot-info">
+        <h2 id="botName">—</h2>
+        <span class="bot-id" id="botId">ID: —</span>
+    </div>
+    <div class="bot-badge" id="botStatusBadge">
+        <span class="badge badge-offline" id="statusBadgeText">Offline</span>
+    </div>
+</div>
+
+<!-- Control Buttons -->
+<div class="control-section">
+    <h3 class="section-title"><i class="fa-solid fa-gamepad"></i> Control del Bot</h3>
+    <div class="control-buttons">
+        <button class="ctrl-btn ctrl-start" id="btnStart" onclick="botAction('start')">
+            <i class="fa-solid fa-play"></i>
+            <span>Iniciar</span>
+        </button>
+        <button class="ctrl-btn ctrl-pause" id="btnPause" onclick="botAction('pause')">
+            <i class="fa-solid fa-pause"></i>
+            <span>Pausar</span>
+        </button>
+        <button class="ctrl-btn ctrl-restart" id="btnRestart" onclick="botAction('restart')">
+            <i class="fa-solid fa-rotate"></i>
+            <span>Reiniciar</span>
+        </button>
+        <button class="ctrl-btn ctrl-stop" id="btnStop" onclick="botAction('stop')">
+            <i class="fa-solid fa-stop"></i>
+            <span>Detener</span>
+        </button>
+    </div>
+    <div class="action-feedback" id="actionFeedback"></div>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon cpu"><i class="fa-solid fa-microchip"></i></div>
+        <div class="stat-body">
+            <span class="stat-value" id="statCpu">—</span>
+            <span class="stat-label">CPU</span>
+        </div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="cpuBar"></div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon ram"><i class="fa-solid fa-memory"></i></div>
+        <div class="stat-body">
+            <span class="stat-value" id="statRam">—</span>
+            <span class="stat-label">RAM</span>
+        </div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="ramBar"></div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon ping"><i class="fa-solid fa-signal"></i></div>
+        <div class="stat-body">
+            <span class="stat-value" id="statPing">—</span>
+            <span class="stat-label">Ping</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon servers"><i class="fa-solid fa-server"></i></div>
+        <div class="stat-body">
+            <span class="stat-value" id="statServers">—</span>
+            <span class="stat-label">Servidores</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon users"><i class="fa-solid fa-users"></i></div>
+        <div class="stat-body">
+            <span class="stat-value" id="statUsers">—</span>
+            <span class="stat-label">Usuarios</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon uptime"><i class="fa-solid fa-clock"></i></div>
+        <div class="stat-body">
+            <span class="stat-value" id="statUptime">—</span>
+            <span class="stat-label">Uptime Panel</span>
+        </div>
+    </div>
+</div>
+
+<!-- Action Toast -->
+<div class="toast" id="toast"></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Discord Bot Panel{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    {% if current_user.is_authenticated %}
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fa-brands fa-discord"></i>
+                    </div>
+                    <span class="logo-text">BotPanel</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <span class="nav-label">Principal</span>
+                    <a href="{{ url_for('dashboard.index') }}" class="nav-item {% if request.endpoint == 'dashboard.index' %}active{% endif %}">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="{{ url_for('console.index') }}" class="nav-item {% if request.endpoint == 'console.index' %}active{% endif %}">
+                        <i class="fa-solid fa-terminal"></i>
+                        <span>Consola</span>
+                    </a>
+                    <a href="{{ url_for('files.index') }}" class="nav-item {% if request.endpoint == 'files.index' %}active{% endif %}">
+                        <i class="fa-solid fa-folder-open"></i>
+                        <span>Archivos</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <span class="nav-label">Configuración</span>
+                    <a href="{{ url_for('settings.index') }}" class="nav-item {% if request.endpoint == 'settings.index' %}active{% endif %}">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span>Ajustes</span>
+                    </a>
+                </div>
+            </nav>
+
+            <!-- Bot status mini -->
+            <div class="sidebar-footer">
+                <div class="bot-status-mini" id="botStatusMini">
+                    <div class="status-dot offline" id="statusDot"></div>
+                    <div class="status-info">
+                        <span class="status-name" id="statusName">Bot</span>
+                        <span class="status-label" id="statusLabel">Offline</span>
+                    </div>
+                </div>
+                <a href="{{ url_for('auth.logout') }}" class="nav-item logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Salir</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-wrapper">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="btn-icon" id="mobileSidebarToggle">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+                </div>
+                <div class="topbar-right">
+                    <div class="user-badge">
+                        <i class="fa-solid fa-user-shield"></i>
+                        <span>{{ current_user.username }}</span>
+                    </div>
+                </div>
+            </header>
+
+            <main class="content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="flash-container">
+                        {% for category, message in messages %}
+                            <div class="flash flash-{{ category }}">
+                                <i class="fa-solid fa-{% if category == 'error' %}circle-xmark{% elif category == 'warning' %}triangle-exclamation{% else %}circle-check{% endif %}"></i>
+                                {{ message }}
+                                <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+    {% else %}
+        {% block auth_content %}{% endblock %}
+    {% endif %}
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

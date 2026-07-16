@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Consola — Bot Panel{% endblock %}
+{% block page_title %}Consola en Tiempo Real{% endblock %}
+
+{% block content %}
+<div class="console-wrap">
+    <div class="console-toolbar">
+        <div class="console-toolbar-left">
+            <span class="console-live-dot"></span>
+            <span>En vivo</span>
+        </div>
+        <div class="console-toolbar-right">
+            <button class="btn btn-sm btn-ghost" onclick="clearConsole()">
+                <i class="fa-solid fa-trash"></i> Limpiar
+            </button>
+            <button class="btn btn-sm btn-ghost" onclick="toggleAutoScroll()">
+                <i class="fa-solid fa-arrow-down" id="autoScrollIcon"></i>
+                <span id="autoScrollLabel">Auto-scroll ON</span>
+            </button>
+            <div class="log-filter">
+                <select id="logFilter" onchange="filterLogs()" class="form-select-sm">
+                    <option value="all">Todos los niveles</option>
+                    <option value="INFO">INFO</option>
+                    <option value="WARNING">WARNING</option>
+                    <option value="ERROR">ERROR</option>
+                    <option value="DEBUG">DEBUG</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="console-output" id="consoleOutput">
+        <div class="console-welcome">
+            <i class="fa-solid fa-terminal"></i>
+            <span>Conectando a la consola...</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/console.js') }}"></script>
+{% endblock %}
