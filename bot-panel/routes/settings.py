@@ -35,10 +35,26 @@ def save_bot():
 
     if "token" in data and data["token"]:
         cfg.token = data["token"]
+    if "client_id" in data:
+        cfg.client_id = data["client_id"][:30]
+    if "client_secret" in data and data["client_secret"]:
+        cfg.client_secret = data["client_secret"]
     if "prefix" in data:
         cfg.prefix = data["prefix"][:10]
     if "timezone" in data:
         cfg.timezone = data["timezone"][:50]
+    if "description" in data:
+        cfg.description = data["description"][:200]
+    if "status_type" in data:
+        cfg.status_type = data["status_type"]
+    if "activity_type" in data:
+        cfg.activity_type = data["activity_type"]
+    if "activity_text" in data:
+        cfg.activity_text = data["activity_text"][:128]
+    if "intent_members" in data:
+        cfg.intent_members = bool(data["intent_members"])
+    if "intent_message_content" in data:
+        cfg.intent_message_content = bool(data["intent_message_content"])
 
     db.session.commit()
     logger.info("Configuración del bot actualizada.")

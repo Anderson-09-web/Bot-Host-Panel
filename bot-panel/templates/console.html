@@ -1,31 +1,28 @@
 {% extends "base.html" %}
 {% block title %}Consola — Bot Panel{% endblock %}
-{% block page_title %}Consola en Tiempo Real{% endblock %}
+{% block page_title %}Consola{% endblock %}
 
 {% block content %}
 <div class="console-wrap">
     <div class="console-toolbar">
         <div class="console-toolbar-left">
             <span class="console-live-dot"></span>
-            <span>En vivo</span>
+            <span class="console-live-label">En vivo</span>
         </div>
         <div class="console-toolbar-right">
-            <button class="btn btn-sm btn-ghost" onclick="clearConsole()">
-                <i class="fa-solid fa-trash"></i> Limpiar
-            </button>
-            <button class="btn btn-sm btn-ghost" onclick="toggleAutoScroll()">
+            <select id="logFilter" onchange="filterLogs()" class="form-select-sm console-filter">
+                <option value="all">Todos</option>
+                <option value="INFO">INFO</option>
+                <option value="WARNING">WARN</option>
+                <option value="ERROR">ERROR</option>
+                <option value="DEBUG">DEBUG</option>
+            </select>
+            <button class="btn-icon console-btn" onclick="toggleAutoScroll()" title="Auto-scroll">
                 <i class="fa-solid fa-arrow-down" id="autoScrollIcon"></i>
-                <span id="autoScrollLabel">Auto-scroll ON</span>
             </button>
-            <div class="log-filter">
-                <select id="logFilter" onchange="filterLogs()" class="form-select-sm">
-                    <option value="all">Todos los niveles</option>
-                    <option value="INFO">INFO</option>
-                    <option value="WARNING">WARNING</option>
-                    <option value="ERROR">ERROR</option>
-                    <option value="DEBUG">DEBUG</option>
-                </select>
-            </div>
+            <button class="btn-icon console-btn" onclick="clearConsole()" title="Limpiar">
+                <i class="fa-solid fa-trash"></i>
+            </button>
         </div>
     </div>
     <div class="console-output" id="consoleOutput">
@@ -33,6 +30,13 @@
             <i class="fa-solid fa-terminal"></i>
             <span>Conectando a la consola...</span>
         </div>
+    </div>
+    <!-- Barra inferior solo mobile: log count + scroll to bottom -->
+    <div class="console-mobile-bar">
+        <span class="console-log-count" id="logCount">0 líneas</span>
+        <button class="btn btn-sm btn-ghost" onclick="scrollBottom()">
+            <i class="fa-solid fa-angles-down"></i> Ir al final
+        </button>
     </div>
 </div>
 {% endblock %}

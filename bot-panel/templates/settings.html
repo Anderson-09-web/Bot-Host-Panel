@@ -5,69 +5,175 @@
 {% block content %}
 <div class="settings-grid">
 
-    <!-- Bot Config -->
-    <div class="settings-card">
+    <!-- ── Credenciales Discord ── -->
+    <div class="settings-card settings-card-full">
         <div class="settings-card-header">
             <i class="fa-brands fa-discord"></i>
-            <h3>Configuración del Bot</h3>
+            <h3>Conexión con Discord</h3>
         </div>
         <div class="settings-body">
-            <div class="form-group">
-                <label>Token de Discord</label>
-                <div class="input-with-toggle">
-                    <input type="password" class="form-input" id="botToken"
-                           placeholder="••••••••••••••••"
-                           value="{{ bot_cfg.token if bot_cfg else '' }}">
-                    <button type="button" class="toggle-password" onclick="toggleVis('botToken', this)">
-                        <i class="fa-solid fa-eye"></i>
-                    </button>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Token del Bot <span class="badge-required">requerido</span></label>
+                    <div class="field-toggle-wrap">
+                        <input class="form-input" id="botToken" type="password"
+                               autocomplete="off" spellcheck="false"
+                               placeholder="Pega aquí tu token de Discord"
+                               value="{{ bot_cfg.token if bot_cfg and bot_cfg.token else '' }}">
+                        <button type="button" class="field-toggle-btn" onclick="toggleField('botToken',this)" title="Mostrar/ocultar">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    <span class="form-hint">Ve a <strong>discord.com/developers</strong> → tu aplicación → Bot → Reset Token</span>
                 </div>
-                <span class="form-hint">Nunca compartas tu token con nadie.</span>
+                <div class="form-group">
+                    <label>Application ID (Client ID)</label>
+                    <input class="form-input" id="botClientId" type="text"
+                           inputmode="numeric" autocomplete="off"
+                           placeholder="Ej: 1234567890123456789"
+                           value="{{ bot_cfg.client_id if bot_cfg else '' }}">
+                    <span class="form-hint">Developers → tu app → General Information → Application ID</span>
+                </div>
             </div>
             <div class="form-row">
                 <div class="form-group">
-                    <label>Prefijo de Comandos</label>
-                    <input type="text" class="form-input" id="botPrefix" maxlength="10"
-                           value="{{ bot_cfg.prefix if bot_cfg else '!' }}" placeholder="!">
+                    <label>Client Secret <span class="form-hint-inline">(OAuth2)</span></label>
+                    <div class="field-toggle-wrap">
+                        <input class="form-input" id="botClientSecret" type="password"
+                               autocomplete="off" placeholder="Solo si usas OAuth2"
+                               value="{{ bot_cfg.client_secret if bot_cfg and bot_cfg.client_secret else '' }}">
+                        <button type="button" class="field-toggle-btn" onclick="toggleField('botClientSecret',this)" title="Mostrar/ocultar">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label>Zona Horaria</label>
-                    <input type="text" class="form-input" id="botTimezone"
-                           value="{{ bot_cfg.timezone if bot_cfg else 'UTC' }}" placeholder="UTC">
+                    <label>Descripción del Bot</label>
+                    <input class="form-input" id="botDescription" type="text" maxlength="200"
+                           placeholder="Una breve descripción de tu bot"
+                           value="{{ bot_cfg.description if bot_cfg else '' }}">
                 </div>
             </div>
             <button class="btn btn-primary" onclick="saveBot()">
+                <i class="fa-solid fa-floppy-disk"></i> Guardar Credenciales
+            </button>
+        </div>
+    </div>
+
+    <!-- ── Comportamiento ── -->
+    <div class="settings-card">
+        <div class="settings-card-header">
+            <i class="fa-solid fa-robot"></i>
+            <h3>Comportamiento</h3>
+        </div>
+        <div class="settings-body">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Prefijo de Comandos</label>
+                    <input class="form-input" id="botPrefix" type="text" maxlength="10"
+                           placeholder="!" value="{{ bot_cfg.prefix if bot_cfg else '!' }}">
+                </div>
+                <div class="form-group">
+                    <label>Zona Horaria</label>
+                    <input class="form-input" id="botTimezone" type="text"
+                           placeholder="UTC" value="{{ bot_cfg.timezone if bot_cfg else 'UTC' }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Intents habilitados</label>
+                <div class="intents-grid">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="intentMembers" {% if bot_cfg and bot_cfg.intent_members %}checked{% endif %}>
+                        <span class="toggle-switch"></span>
+                        <span>Members Intent</span>
+                    </label>
+                    <label class="toggle-label">
+                        <input type="checkbox" id="intentMsgContent" {% if bot_cfg and bot_cfg.intent_message_content %}checked{% endif %}>
+                        <span class="toggle-switch"></span>
+                        <span>Message Content Intent</span>
+                    </label>
+                </div>
+                <span class="form-hint">Actívalos también en el Portal de Desarrolladores → Bot → Privileged Gateway Intents</span>
+            </div>
+            <button class="btn btn-primary" onclick="saveBehavior()">
                 <i class="fa-solid fa-floppy-disk"></i> Guardar
             </button>
         </div>
     </div>
 
-    <!-- Lavalink Config -->
+    <!-- ── Presencia ── -->
+    <div class="settings-card">
+        <div class="settings-card-header">
+            <i class="fa-solid fa-circle-dot"></i>
+            <h3>Presencia del Bot</h3>
+        </div>
+        <div class="settings-body">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Estado</label>
+                    <select class="form-input form-select" id="botStatus">
+                        <option value="online"    {% if bot_cfg and bot_cfg.status_type == 'online' %}selected{% endif %}>🟢 En línea</option>
+                        <option value="idle"      {% if bot_cfg and bot_cfg.status_type == 'idle' %}selected{% endif %}>🌙 Ausente</option>
+                        <option value="dnd"       {% if bot_cfg and bot_cfg.status_type == 'dnd' %}selected{% endif %}>🔴 No molestar</option>
+                        <option value="invisible" {% if bot_cfg and bot_cfg.status_type == 'invisible' %}selected{% endif %}>⚫ Invisible</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Actividad</label>
+                    <select class="form-input form-select" id="botActivityType">
+                        <option value="playing"    {% if bot_cfg and bot_cfg.activity_type == 'playing' %}selected{% endif %}>🎮 Jugando</option>
+                        <option value="watching"   {% if bot_cfg and bot_cfg.activity_type == 'watching' %}selected{% endif %}>📺 Viendo</option>
+                        <option value="listening"  {% if bot_cfg and bot_cfg.activity_type == 'listening' %}selected{% endif %}>🎵 Escuchando</option>
+                        <option value="streaming"  {% if bot_cfg and bot_cfg.activity_type == 'streaming' %}selected{% endif %}>📡 Transmitiendo</option>
+                        <option value="competing"  {% if bot_cfg and bot_cfg.activity_type == 'competing' %}selected{% endif %}>🏆 Compitiendo en</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Texto de Actividad</label>
+                <input class="form-input" id="botActivityText" type="text" maxlength="128"
+                       placeholder="Ej: con servidores | !help"
+                       value="{{ bot_cfg.activity_text if bot_cfg else '' }}">
+            </div>
+            <div class="presence-preview" id="presencePreview">
+                <span class="presence-dot" id="presenceDot"></span>
+                <div class="presence-info">
+                    <span class="presence-name">{{ bot_cfg.description or 'Mi Bot' if bot_cfg else 'Mi Bot' }}</span>
+                    <span class="presence-activity" id="presenceActivity">Jugando con servidores</span>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="savePresence()">
+                <i class="fa-solid fa-floppy-disk"></i> Guardar Presencia
+            </button>
+        </div>
+    </div>
+
+    <!-- ── Lavalink ── -->
     <div class="settings-card">
         <div class="settings-card-header">
             <i class="fa-solid fa-music"></i>
-            <h3>Configuración Lavalink</h3>
+            <h3>Lavalink / Música</h3>
         </div>
         <div class="settings-body">
             <div class="form-row">
                 <div class="form-group">
                     <label>Host</label>
-                    <input type="text" class="form-input" id="lavaHost"
-                           value="{{ lava_cfg.host if lava_cfg else 'localhost' }}" placeholder="localhost">
+                    <input class="form-input" id="lavaHost" type="text"
+                           placeholder="localhost" value="{{ lava_cfg.host if lava_cfg else 'localhost' }}">
                 </div>
                 <div class="form-group">
                     <label>Puerto</label>
-                    <input type="number" class="form-input" id="lavaPort"
-                           value="{{ lava_cfg.port if lava_cfg else 2333 }}" placeholder="2333">
+                    <input class="form-input" id="lavaPort" type="number"
+                           placeholder="2333" value="{{ lava_cfg.port if lava_cfg else 2333 }}">
                 </div>
             </div>
             <div class="form-group">
                 <label>Contraseña</label>
-                <div class="input-with-toggle">
-                    <input type="password" class="form-input" id="lavaPassword"
-                           placeholder="youshallnotpass"
+                <div class="field-toggle-wrap">
+                    <input class="form-input" id="lavaPassword" type="password"
+                           autocomplete="off" placeholder="youshallnotpass"
                            value="{{ lava_cfg.password if lava_cfg else '' }}">
-                    <button type="button" class="toggle-password" onclick="toggleVis('lavaPassword', this)">
+                    <button type="button" class="field-toggle-btn" onclick="toggleField('lavaPassword',this)">
                         <i class="fa-solid fa-eye"></i>
                     </button>
                 </div>
@@ -76,7 +182,7 @@
                 <label class="toggle-label">
                     <input type="checkbox" id="lavaSSL" {% if lava_cfg and lava_cfg.ssl %}checked{% endif %}>
                     <span class="toggle-switch"></span>
-                    Usar SSL (HTTPS)
+                    Usar SSL
                 </label>
             </div>
             <div class="lava-status-row">
@@ -94,16 +200,16 @@
         </div>
     </div>
 
-    <!-- Panel Config -->
+    <!-- ── Panel ── -->
     <div class="settings-card">
         <div class="settings-card-header">
             <i class="fa-solid fa-palette"></i>
-            <h3>Configuración del Panel</h3>
+            <h3>Panel</h3>
         </div>
         <div class="settings-body">
             <div class="form-group">
                 <label>Nombre del Panel</label>
-                <input type="text" class="form-input" id="panelName"
+                <input class="form-input" id="panelName" type="text"
                        value="{{ panel_cfg.panel_name if panel_cfg else 'Discord Bot Panel' }}">
             </div>
             <button class="btn btn-primary" onclick="savePanel()">
@@ -113,7 +219,6 @@
     </div>
 
 </div>
-
 <div class="toast" id="toast"></div>
 {% endblock %}
 
