@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: discord-bot-panel
+    runtime: python
+    rootDir: bot-panel
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -w 2 -b 0.0.0.0:$PORT --timeout 120 --keep-alive 5 app:app
+    healthCheckPath: /login
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: BOT_PREFIX
+        value: "!"
+      - key: BOT_TIMEZONE
+        value: UTC
+      - key: LAVALINK_PORT
+        value: "2333"
+      - key: LAVALINK_SSL
+        value: "false"
+      - key: ADMIN_USERNAME
+        value: admin
+      # Estos los añades manualmente en Render Dashboard → Environment:
+      # SECRET_KEY        → cadena larga aleatoria
+      # ADMIN_PASSWORD    → tu contraseña para el panel
+      # DATABASE_URL      → connection string de Neon
+      # BOT_TOKEN         → token de tu bot de Discord
+      # R2_ENDPOINT       → endpoint S3 de Cloudflare R2
+      # R2_ACCESS_KEY     → access key ID de R2
+      # R2_SECRET_KEY     → secret access key de R2
+      # R2_BUCKET         → nombre del bucket
+      # R2_PUBLIC_URL     → URL pública del bucket (opcional)

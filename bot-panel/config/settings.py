@@ -14,7 +14,8 @@ class Config:
     SESSION_KEY: str = os.environ.get("SESSION_KEY", "dev-session-change-me")
     FLASK_ENV: str = os.environ.get("FLASK_ENV", "production")
     DEBUG: bool = FLASK_ENV == "development"
-    PORT: int = int(os.environ.get("PANEL_PORT", 5000))
+    # PORT: Render usa "PORT", Replit usa "PANEL_PORT", fallback 5000
+    PORT: int = int(os.environ.get("PORT") or os.environ.get("PANEL_PORT", 5000))
 
     # SQLAlchemy / Neon PostgreSQL
     SQLALCHEMY_DATABASE_URI: str = os.environ.get("DATABASE_URL", "")
