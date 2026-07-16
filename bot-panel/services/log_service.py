@@ -18,6 +18,9 @@ _NOISE_PATTERNS = (
     " * Running on",
     " * Restarting with",
     " * Detected change in",
+    # Peticiones HTTP — no mostrar en consola del bot
+    '" 200 ', '" 302 ', '" 304 ', '" 400 ', '" 404 ', '" 500 ', '" 502 ',
+    "GET /api/", "POST /api/", "GET /static/", "GET /favicon",
 )
 
 

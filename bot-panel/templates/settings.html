@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% block title %}Configuración — Bot Panel{% endblock %}
-{% block page_title %}Configuración{% endblock %}
+{% block title %}Ajustes — Bot Panel{% endblock %}
+{% block page_title %}Ajustes{% endblock %}
 
 {% block content %}
 <div class="settings-grid">
@@ -112,122 +112,6 @@
         </div>
     </div>
 
-    <!-- Variables de Entorno -->
-    <div class="settings-card settings-card-full">
-        <div class="settings-card-header">
-            <i class="fa-solid fa-code"></i>
-            <h3>Variables de Entorno</h3>
-            <span class="settings-card-badge">{{ env_vars|length }}</span>
-            <button class="btn btn-sm btn-primary" style="margin-left:auto" onclick="openVarModal()">
-                <i class="fa-solid fa-plus"></i> Nueva Variable
-            </button>
-        </div>
-        <div class="settings-body">
-            <p class="form-hint" style="margin-bottom:1rem">
-                <i class="fa-solid fa-circle-info"></i>
-                Estas variables se cargan en el proceso del panel al guardarse. Úsalas para tokens, URLs y configuración extra de tu bot. Márcalas como <strong>Secreto</strong> para ocultar el valor en la UI.
-            </p>
-
-            {% if env_vars %}
-            <div class="vars-table-wrap">
-                <table class="vars-table">
-                    <thead>
-                        <tr>
-                            <th>Clave</th>
-                            <th>Valor</th>
-                            <th>Descripción</th>
-                            <th>Actualizado</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="varsTableBody">
-                        {% for v in env_vars %}
-                        <tr id="var-row-{{ v.id }}">
-                            <td>
-                                <code class="var-key">{{ v.key }}</code>
-                                {% if v.is_secret %}<span class="var-badge-secret"><i class="fa-solid fa-lock"></i> Secreto</span>{% endif %}
-                            </td>
-                            <td class="var-value-cell">
-                                {% if v.is_secret %}
-                                <span class="var-secret-mask" id="varval-{{ v.id }}">••••••••</span>
-                                <button class="btn-icon" title="Revelar" onclick="toggleReveal({{ v.id }}, '{{ v.key }}')">
-                                    <i class="fa-solid fa-eye" id="reveal-icon-{{ v.id }}"></i>
-                                </button>
-                                {% else %}
-                                <span class="var-value" id="varval-{{ v.id }}">{{ v.value if v.value else '—' }}</span>
-                                {% endif %}
-                            </td>
-                            <td class="var-desc">{{ v.description if v.description else '—' }}</td>
-                            <td class="var-date">{{ v.updated_at.strftime('%d/%m %H:%M') if v.updated_at else '—' }}</td>
-                            <td class="var-actions">
-                                <button class="btn-icon" title="Editar"
-                                        onclick="openVarModal({{ v.id }}, '{{ v.key }}', {{ 'true' if v.is_secret else 'false' }}, '{{ v.description }}')">
-                                    <i class="fa-solid fa-pen"></i>
-                                </button>
-                                <button class="btn-icon btn-icon-danger" title="Eliminar"
-                                        onclick="deleteVar({{ v.id }}, '{{ v.key }}')">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <div class="vars-empty" id="varsEmpty">
-                <i class="fa-solid fa-code"></i>
-                <p>Aún no hay variables. Crea la primera con el botón de arriba.</p>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-
-</div>
-
-<!-- Modal Nueva / Editar Variable -->
-<div class="modal-overlay" id="varModal" onclick="closeVarModal(event)">
-    <div class="modal-box">
-        <div class="modal-header">
-            <h3 id="varModalTitle"><i class="fa-solid fa-code"></i> Nueva Variable</h3>
-            <button class="modal-close" onclick="closeVarModal()"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="modal-body">
-            <input type="hidden" id="varEditId" value="">
-            <div class="form-group">
-                <label>Clave <span class="required">*</span></label>
-                <input type="text" class="form-input" id="varKey" placeholder="MI_VARIABLE"
-                       oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9_]/g,'')">
-                <span class="form-hint">Solo mayúsculas, números y guiones bajos. Ej: <code>BOT_TOKEN</code></span>
-            </div>
-            <div class="form-group">
-                <label>Valor</label>
-                <div class="input-with-toggle">
-                    <input type="password" class="form-input" id="varValue" placeholder="valor de la variable">
-                    <button type="button" class="toggle-password" onclick="toggleVis('varValue', this)">
-                        <i class="fa-solid fa-eye"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Descripción <span class="form-hint-inline">(opcional)</span></label>
-                <input type="text" class="form-input" id="varDesc" placeholder="Para qué sirve esta variable..." maxlength="200">
-            </div>
-            <div class="form-group">
-                <label class="toggle-label">
-                    <input type="checkbox" id="varIsSecret">
-                    <span class="toggle-switch"></span>
-                    Marcar como Secreto <span class="form-hint-inline">(oculta el valor en la tabla)</span>
-                </label>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-ghost" onclick="closeVarModal()">Cancelar</button>
-            <button class="btn btn-primary" onclick="saveVar()">
-                <i class="fa-solid fa-floppy-disk"></i> Guardar
-            </button>
-        </div>
-    </div>
 </div>
 
 <div class="toast" id="toast"></div>

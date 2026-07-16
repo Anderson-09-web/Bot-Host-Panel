@@ -64,12 +64,14 @@ def create_app() -> Flask:
     from routes.console import console_bp
     from routes.settings import settings_bp
     from routes.files import files_bp
+    from routes.variables import variables_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(console_bp)
     app.register_blueprint(settings_bp)
     app.register_blueprint(files_bp)
+    app.register_blueprint(variables_bp)
 
     @app.route("/")
     def root():

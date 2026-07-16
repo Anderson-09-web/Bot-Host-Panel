@@ -50,6 +50,10 @@
                         <i class="fa-solid fa-sliders"></i>
                         <span>Ajustes</span>
                     </a>
+                    <a href="{{ url_for('variables.index') }}" class="nav-item {% if request.endpoint == 'variables.index' %}active{% endif %}">
+                        <i class="fa-solid fa-code"></i>
+                        <span>Variables</span>
+                    </a>
                 </div>
             </nav>
 
