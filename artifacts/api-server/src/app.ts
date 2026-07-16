@@ -1,6 +1,7 @@
 import express, { type Express } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
+import { createProxyMiddleware } from "http-proxy-middleware";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
@@ -30,5 +31,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
+
+// Proxy todo lo demás al panel Flask (puerto 5000)
+app.use(
+  "/",
+  createProxyMiddleware({
+    target: "http://127.0.0.1:5000",
+    changeOrigin: true,
+    ws: true,
+    on: {
+      error: (err, _req, res: any) => {
+        logger.error({ err }, "Proxy error hacia Flask panel");
+        res.status?.(502).send("Panel no disponible — asegúrate de que Bot Panel esté corriendo.");
+      },
+    },
+  }),
+);
 
 export default app;
