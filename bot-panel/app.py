@@ -5,6 +5,7 @@ Punto de entrada. Ejecutar con: python app.py
 import os
 import logging
 from flask import Flask, redirect, url_for
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
 from dotenv import load_dotenv
@@ -22,6 +23,7 @@ def create_app() -> Flask:
         template_folder="templates",
         static_folder="static",
     )
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
     app.config.from_object(Config)
 
     # Asegurar directorios necesarios

@@ -36,7 +36,8 @@ class Config:
 
     # Sesiones
     SESSION_COOKIE_HTTPONLY: bool = True
-    SESSION_COOKIE_SAMESITE: str = "Lax"
+    SESSION_COOKIE_SAMESITE: str = "None"   # Necesario para el proxy/iframe de Replit
+    SESSION_COOKIE_SECURE: bool = True       # Requerido cuando SameSite=None
     PERMANENT_SESSION_LIFETIME: int = 86400  # 24h
 
     # Bot Discord
