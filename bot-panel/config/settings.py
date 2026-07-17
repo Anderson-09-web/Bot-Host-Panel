@@ -18,7 +18,10 @@ class Config:
     PORT: int = int(os.environ.get("PORT") or os.environ.get("PANEL_PORT", 5000))
 
     # SQLAlchemy / Neon PostgreSQL
-    SQLALCHEMY_DATABASE_URI: str = os.environ.get("DATABASE_URL", "")
+    # NEON_DATABASE_URL takes priority so it doesn't conflict with Replit's managed DATABASE_URL
+    SQLALCHEMY_DATABASE_URI: str = (
+        os.environ.get("NEON_DATABASE_URL") or os.environ.get("DATABASE_URL", "")
+    )
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
     SQLALCHEMY_ENGINE_OPTIONS: dict = {
         "pool_pre_ping": True,
