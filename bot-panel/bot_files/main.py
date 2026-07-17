@@ -72,6 +72,6 @@ if __name__ == "__main__":
     async def main():
         async with bot:
             await load_cogs()
-            await bot.start(BOT_TOKEN)
+            await bot.start(BOT_TOKN)
 
     asyncio.run(main())

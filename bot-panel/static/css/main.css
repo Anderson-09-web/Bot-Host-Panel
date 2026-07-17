@@ -1108,9 +1108,8 @@ body {
 .vars-empty i { font-size: 32px; opacity: .4; }
 .vars-empty p { font-size: 13px; }
 
-/* ── Modal (estilos faltantes) ── */
+/* ── Modal overlay base (oculto por defecto) ── */
 .modal-overlay { display: none; }
-.modal-overlay.active { display: flex; }
 
 .modal-box {
   background: var(--bg-card);
@@ -1148,12 +1147,12 @@ body {
 }
 
 /* ── Modals ────────────────────────────────────── */
-.modal-overlay {
+.modal-overlay.active {
+  display: flex;
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.6);
   z-index: 500;
-  display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
