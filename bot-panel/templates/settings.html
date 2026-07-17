@@ -132,8 +132,14 @@
             <div class="form-group">
                 <label>Texto de Actividad</label>
                 <input class="form-input" id="botActivityText" type="text" maxlength="128"
-                       placeholder="Ej: con servidores | !help"
+                       placeholder="Ej: {servers} servidores | {users} usuarios"
                        value="{{ bot_cfg.activity_text if bot_cfg else '' }}">
+                <small class="form-hint">
+                    Variables disponibles:
+                    <code>{servers}</code> — nº de servidores &nbsp;
+                    <code>{users}</code> — usuarios totales &nbsp;
+                    <code>{ping}</code> — latencia en ms
+                </small>
             </div>
             <div class="presence-preview" id="presencePreview">
                 <span class="presence-dot" id="presenceDot"></span>

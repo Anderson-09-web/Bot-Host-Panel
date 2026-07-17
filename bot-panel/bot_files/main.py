@@ -14,7 +14,7 @@ import asyncio
 import logging
 import aiohttp
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 # ── Logging ──────────────────────────────────────────
 log = logging.getLogger("bot")
@@ -108,16 +108,35 @@ class MyBot(commands.Bot):
 
         log.info(f"Cogs: {loaded} cargados, {failed} con error.")
 
+    def _resolve_activity_text(self) -> str:
+        """Reemplaza variables en ACTIVITY_TEXT con datos reales del bot."""
+        total_users = sum(g.member_count or 0 for g in self.guilds)
+        return (
+            ACTIVITY_TEXT
+            .replace("{servers}", str(len(self.guilds)))
+            .replace("{users}",   str(total_users))
+            .replace("{ping}",    str(round(self.latency * 1000)))
+        )
+
+    async def _apply_presence(self):
+        """Aplica la presencia actual con variables resueltas."""
+        status   = _STATUS_MAP.get(STATUS_TYPE, discord.Status.online)
+        act_type = _ACTIVITY_MAP.get(ACTIVITY_TYPE, discord.ActivityType.playing)
+        text     = self._resolve_activity_text()
+        activity = discord.Activity(type=act_type, name=text) if text else None
+        await self.change_presence(status=status, activity=activity)
+
     # ── Eventos ───────────────────────────────────────
     async def on_ready(self):
         log.info(f"Conectado como {self.user} (ID: {self.user.id})")
         log.info(f"Servidores: {len(self.guilds)}")
 
-        # Aplicar presencia desde configuración del panel
-        status   = _STATUS_MAP.get(STATUS_TYPE, discord.Status.online)
-        act_type = _ACTIVITY_MAP.get(ACTIVITY_TYPE, discord.ActivityType.playing)
-        activity = discord.Activity(type=act_type, name=ACTIVITY_TEXT) if ACTIVITY_TEXT else None
-        await self.change_presence(status=status, activity=activity)
+        # Aplicar presencia con variables resueltas
+        await self._apply_presence()
+
+        # Iniciar tarea de refresco de presencia (si no está corriendo)
+        if not self._refresh_presence.is_running():
+            self._refresh_presence.start()
 
         # Enviar info del bot al panel (bot_manager parsea esta línea)
         import json as _json
@@ -131,6 +150,11 @@ class MyBot(commands.Bot):
             "ping":       round(self.latency * 1000),
         }
         print(f"BOT_INFO:{_json.dumps(_info)}", flush=True)
+
+    @tasks.loop(minutes=5)
+    async def _refresh_presence(self):
+        """Refresca la presencia cada 5 min para que {servers}/{users}/{ping} estén al día."""
+        await self._apply_presence()
 
     async def on_command_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.CommandNotFound):
