@@ -119,6 +119,19 @@ class MyBot(commands.Bot):
         activity = discord.Activity(type=act_type, name=ACTIVITY_TEXT) if ACTIVITY_TEXT else None
         await self.change_presence(status=status, activity=activity)
 
+        # Enviar info del bot al panel (bot_manager parsea esta línea)
+        import json as _json
+        total_users = sum(g.member_count or 0 for g in self.guilds)
+        _info = {
+            "name":       str(self.user),
+            "bot_id":     str(self.user.id),
+            "avatar_url": str(self.user.display_avatar.url),
+            "guilds":     len(self.guilds),
+            "users":      total_users,
+            "ping":       round(self.latency * 1000),
+        }
+        print(f"BOT_INFO:{_json.dumps(_info)}", flush=True)
+
     async def on_command_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.CommandNotFound):
             return

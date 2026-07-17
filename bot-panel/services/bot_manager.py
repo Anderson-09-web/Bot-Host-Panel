@@ -20,12 +20,31 @@ _lock = threading.Lock()
 
 
 def _stream_logs(proc: subprocess.Popen):
-    """Lee stdout/stderr del proceso bot y los envía al logger."""
+    """Lee stdout/stderr del proceso bot y los envía al logger.
+    Detecta la línea BOT_INFO:{...} para actualizar el estado del panel."""
+    import json as _json
     try:
         for line in iter(proc.stdout.readline, b""):
             decoded = line.decode("utf-8", errors="replace").rstrip()
-            if decoded:
-                logger.info(f"[BOT] {decoded}")
+            if not decoded:
+                continue
+            # Línea especial: info del bot al arrancar
+            if decoded.startswith("BOT_INFO:"):
+                try:
+                    info = _json.loads(decoded[len("BOT_INFO:"):])
+                    update_bot_stats(
+                        name=info.get("name", "—"),
+                        bot_id=info.get("bot_id", "—"),
+                        avatar_url=info.get("avatar_url", ""),
+                        guilds=info.get("guilds", 0),
+                        users=info.get("users", 0),
+                        ping=info.get("ping", 0),
+                    )
+                    logger.info(f"[BOT] Info actualizada — {info.get('name')} ({info.get('bot_id')}) avatar={'sí' if info.get('avatar_url') else 'no'}")
+                except Exception as parse_err:
+                    logger.warning(f"[BOT] No pude parsear BOT_INFO: {parse_err}")
+                continue
+            logger.info(f"[BOT] {decoded}")
     except Exception as e:
         logger.warning(f"[BOT] Error leyendo stdout: {e}")
 
