@@ -1,2 +1,14 @@
+# ── Discord ────────────────────────────────────────
 discord.py>=2.4.0
+
+# ── HTTP / Async ────────────────────────────────────
 aiohttp>=3.9.0
+
+# ── Música (Lavalink) ───────────────────────────────
+wavelink>=3.4.0
+
+# ── Voz (opcional, para canales de voz sin Lavalink) ─
+# PyNaCl>=1.5.0   # descomenta si necesitas voz directa
+
+# ── Utilidades ──────────────────────────────────────
+python-dotenv>=1.0.0    # leer .env localmente

@@ -79,9 +79,8 @@ class MyBot(commands.Bot):
         # Cargar cogs
         await self._load_cogs()
 
-        # Conectar a Lavalink si está configurado
-        if LAVALINK_HOST:
-            await self._connect_lavalink()
+        # Nota: Lavalink lo gestiona el cog cogs/lavalink.py
+        # No conectar aquí para evitar conflicto con el cog.
 
         # Sincronizar slash commands globalmente
         await self.tree.sync()
@@ -108,20 +107,6 @@ class MyBot(commands.Bot):
                 failed += 1
 
         log.info(f"Cogs: {loaded} cargados, {failed} con error.")
-
-    async def _connect_lavalink(self):
-        try:
-            import wavelink
-            node = wavelink.Node(
-                uri=f"http://{LAVALINK_HOST}:{LAVALINK_PORT}",
-                password=LAVALINK_PASS,
-            )
-            await wavelink.Pool.connect(nodes=[node], client=self, cache_capacity=100)
-            log.info(f"Wavelink conectado a {LAVALINK_HOST}:{LAVALINK_PORT}")
-        except ImportError:
-            log.warning("wavelink no instalado — música desactivada.")
-        except Exception as e:
-            log.error(f"Error conectando a Lavalink: {e}")
 
     # ── Eventos ───────────────────────────────────────
     async def on_ready(self):

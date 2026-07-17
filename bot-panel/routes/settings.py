@@ -94,13 +94,28 @@ def save_lavalink():
 @settings_bp.route("/api/settings/lavalink/reconnect", methods=["POST"])
 @login_required
 def reconnect_lavalink():
-    """Dispara reconexión de Lavalink (señal al bot)."""
+    """Reinicia el bot para que el cog Lavalink reconecte con la nueva config."""
     from services import bot_manager
     status = bot_manager.get_status()
     if not status["running"]:
         return jsonify({"success": False, "message": "El bot no está corriendo."})
-    logger.info("Reconexión Lavalink solicitada.")
-    return jsonify({"success": True, "message": "Señal de reconexión enviada."})
+
+    # Inyectar config en env para que main.py la lea al reiniciar
+    cfg = LavalinkConfig.query.first()
+    if cfg:
+        os.environ["LAVALINK_HOST"]     = cfg.host or ""
+        os.environ["LAVALINK_PORT"]     = str(cfg.port or 2333)
+        os.environ["LAVALINK_PASSWORD"] = cfg.password or "youshallnotpass"
+
+    import threading
+    def _restart():
+        import time
+        time.sleep(0.5)
+        bot_manager.restart_bot()
+    threading.Thread(target=_restart, daemon=True).start()
+
+    logger.info("Reconexión Lavalink: bot reiniciando.")
+    return jsonify({"success": True, "message": "Bot reiniciando para aplicar nueva config Lavalink…"})
 
 
 @settings_bp.route("/api/settings/vars", methods=["GET"])
