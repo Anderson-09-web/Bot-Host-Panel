@@ -1,45 +1,39 @@
-# [Project name]
+# Discord Bot Panel
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
-
-## Run & Operate
-
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+A Flask web application that serves as an admin panel for a Discord bot.
 
 ## Stack
+- **Backend:** Python 3.12, Flask, Flask-SQLAlchemy, Flask-Login, Flask-WTF
+- **Bot:** discord.py, wavelink (Lavalink music)
+- **Database:** Neon PostgreSQL (via `NEON_DATABASE_URL`)
+- **Storage:** Cloudflare R2 (optional)
+- **Entry point:** `bot-panel/app.py`
 
-- pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+## How to run
+The **Bot Panel** workflow runs `cd bot-panel && python app.py` and serves on port 5000.
 
-## Where things live
+## Required secrets (Replit Secrets)
+| Secret | Description |
+|--------|-------------|
+| `BOT_TOKEN` | Discord bot token |
+| `NEON_DATABASE_URL` | Neon PostgreSQL connection string |
+| `SECRET_KEY` | Flask session secret key |
+| `ADMIN_PASSWORD` | Password for the admin panel user |
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+## Optional secrets (for Cloudflare R2 storage)
+| Secret | Description |
+|--------|-------------|
+| `R2_ENDPOINT` | `https://ACCOUNT_ID.r2.cloudflarestorage.com` |
+| `R2_ACCESS_KEY` | R2 access key |
+| `R2_SECRET_KEY` | R2 secret key |
+| `R2_BUCKET` | Bucket name |
+| `R2_PUBLIC_URL` | Public R2 URL |
 
-## Architecture decisions
-
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
-
-## Product
-
-_Describe the high-level user-facing capabilities of this app once they exist._
+## Optional secrets (for Lavalink music)
+| Secret | Description |
+|--------|-------------|
+| `LAVALINK_HOST` | Lavalink server host |
+| `LAVALINK_PASSWORD` | Lavalink password |
 
 ## User preferences
-
-_Populate as you build — explicit user instructions worth remembering across sessions._
-
-## Gotchas
-
-_Populate as you build — sharp edges, "always run X before Y" rules._
-
-## Pointers
-
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- Spanish-language project; keep comments and logs in Spanish where present.
