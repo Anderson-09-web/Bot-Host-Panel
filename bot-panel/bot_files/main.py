@@ -155,6 +155,18 @@ class MyBot(commands.Bot):
     async def _refresh_presence(self):
         """Refresca la presencia cada 5 min para que {servers}/{users}/{ping} estén al día."""
         await self._apply_presence()
+        # También actualiza el panel con stats frescos
+        import json as _json
+        total_users = sum(g.member_count or 0 for g in self.guilds)
+        _info = {
+            "name":       str(self.user),
+            "bot_id":     str(self.user.id),
+            "avatar_url": str(self.user.display_avatar.url),
+            "guilds":     len(self.guilds),
+            "users":      total_users,
+            "ping":       round(self.latency * 1000),
+        }
+        print(f"BOT_INFO:{_json.dumps(_info)}", flush=True)
 
     async def on_command_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.CommandNotFound):

@@ -1,0 +1,58 @@
+services:
+  - type: web
+    name: discord-bot-panel
+    runtime: python
+    rootDir: bot-panel
+    buildCommand: pip install -r requirements.txt
+    startCommand: >
+      gunicorn app:app
+      --bind 0.0.0.0:$PORT
+      --workers 2
+      --threads 2
+      --worker-class gthread
+      --timeout 120
+      --keep-alive 5
+      --log-level info
+      --access-logfile -
+      --error-logfile -
+    healthCheckPath: /login
+
+    envVars:
+      # ── Valores fijos (no secretos) ────────────────────
+      - key: FLASK_ENV
+        value: production
+      - key: BOT_PREFIX
+        value: "!"
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: BOT_TIMEZONE
+        value: UTC
+      - key: LAVALINK_PORT
+        value: "443"
+      - key: LAVALINK_SSL
+        value: "true"
+
+      # ── Secretos — añade el valor en Render Dashboard ──
+      # Settings → Environment → Add Environment Variable
+      - key: SECRET_KEY
+        sync: false          # cadena larga aleatoria, mínimo 32 caracteres
+      - key: DATABASE_URL
+        sync: false          # postgresql://user:pass@host.neon.tech/db?sslmode=require
+      - key: BOT_TOKEN
+        sync: false          # token de tu bot en discord.com/developers
+      - key: ADMIN_PASSWORD
+        sync: false          # contraseña para entrar al panel
+      - key: R2_ENDPOINT
+        sync: false          # https://TU_ACCOUNT_ID.r2.cloudflarestorage.com
+      - key: R2_ACCESS_KEY
+        sync: false          # access key ID de Cloudflare R2
+      - key: R2_SECRET_KEY
+        sync: false          # secret access key de Cloudflare R2
+      - key: R2_BUCKET
+        sync: false          # nombre del bucket R2
+      - key: R2_PUBLIC_URL
+        sync: false          # https://pub-XXXXX.r2.dev  (opcional)
+      - key: LAVALINK_HOST
+        sync: false          # host del servidor Lavalink (sin https://)
+      - key: LAVALINK_PASSWORD
+        sync: false          # password del nodo Lavalink

@@ -1,49 +1,56 @@
-# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
 
-# compiled output
-dist
-tmp
-out-tsc
-*.tsbuildinfo
-.expo
-.expo-shared
+# Entornos virtuales
+venv/
+.venv/
+env/
+.env
 
-# dependencies
-node_modules
+# Secretos / configuración local
+bot-panel/.env
+*.env.local
 
-# IDEs and editors
-/.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
+# Base de datos local
+*.db
+*.sqlite3
 
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+# Logs
+*.log
+bot-panel/logs/
 
-# misc
-/.sass-cache
-/connect.lock
-/coverage
-/libpeerconnection.log
-npm-debug.log
-yarn-error.log
-testem.log
-/typings
+# Archivos subidos / backups
+bot-panel/uploads/
+bot-panel/backups/
+bot-panel/instance/
 
-# System Files
-.DS_Store
-Thumbs.db
+# Node / pnpm
+node_modules/
+.pnpm-store/
 
-.cursor/rules/nx-rules.mdc
-.github/instructions/nx.instructions.md
+# Builds
+dist/
+artifacts/*/dist/
+artifacts/*/.next/
 
 # Replit
+.replit
+replit.nix
+.upm/
 .cache/
 .local/
+
+# macOS
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/

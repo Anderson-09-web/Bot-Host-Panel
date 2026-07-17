@@ -52,7 +52,9 @@ app.use(
       },
       error: (err, _req, res: any) => {
         logger.error({ err }, "Proxy error hacia Flask panel");
-        res.status?.(502).send("Panel no disponible — asegúrate de que Bot Panel esté corriendo.");
+        if (!res.headersSent) {
+          res.status?.(502).send("Panel no disponible — asegúrate de que Bot Panel esté corriendo.");
+        }
       },
     },
   }),

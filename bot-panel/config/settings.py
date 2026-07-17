@@ -33,12 +33,14 @@ class Config:
     # WTF / CSRF
     WTF_CSRF_ENABLED: bool = True
     WTF_CSRF_TIME_LIMIT: int = 3600
-    WTF_CSRF_SSL_STRICT: bool = False       # Permite el proxy de Replit (host ≠ referrer)
+    WTF_CSRF_SSL_STRICT: bool = False       # False para que funcione detrás de proxy (Replit/Render)
 
     # Sesiones
+    # SameSite=None es necesario en Replit (iframe proxied).
+    # En Render (HTTPS directo) también funciona correctamente con Secure=True.
     SESSION_COOKIE_HTTPONLY: bool = True
-    SESSION_COOKIE_SAMESITE: str = "None"   # Necesario para el proxy/iframe de Replit
-    SESSION_COOKIE_SECURE: bool = True       # Requerido cuando SameSite=None
+    SESSION_COOKIE_SAMESITE: str = "None"
+    SESSION_COOKIE_SECURE: bool = True
     PERMANENT_SESSION_LIFETIME: int = 86400  # 24h
 
     # Bot Discord
