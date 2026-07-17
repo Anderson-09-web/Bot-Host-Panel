@@ -33,6 +33,7 @@ class Config:
     # WTF / CSRF
     WTF_CSRF_ENABLED: bool = True
     WTF_CSRF_TIME_LIMIT: int = 3600
+    WTF_CSRF_SSL_STRICT: bool = False       # Permite el proxy de Replit (host ≠ referrer)
 
     # Sesiones
     SESSION_COOKIE_HTTPONLY: bool = True
