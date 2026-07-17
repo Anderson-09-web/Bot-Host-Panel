@@ -28,10 +28,10 @@ app.use(
 );
 app.use(cors());
 
-// Parsers SOLO para /api — no deben correr antes del proxy
-// o consumen el body stream y Flask recibe request vacía
-app.use("/api", express.json());
-app.use("/api", express.urlencoded({ extended: true }));
+// IMPORTANTE: NO poner body parsers globales aquí.
+// El proxy reenvía el body stream crudo a Flask; si Express lo
+// consume primero, Flask recibe JSON vacío y falla.
+// Los parsers se aplican sólo dentro de las rutas que Express maneja.
 app.use("/api", router);
 
 // Proxy todo lo demás al panel Flask (puerto 5000)

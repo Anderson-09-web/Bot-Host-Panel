@@ -1,16 +1,2 @@
-# Dependencias del bot de Discord
-# Instalar con: pip install -r requirements.txt
-
 discord.py>=2.4.0
 aiohttp>=3.9.0
-
-# Música (Lavalink/Wavelink) — descomenta si lo necesitas
-# wavelink>=3.4.0
-
-# Base de datos (si tu bot usa DB propia)
-# asyncpg>=0.29.0
-# sqlalchemy[asyncio]>=2.0.0
-
-# Utilidades opcionales
-# python-dotenv>=1.0.0
-# Pillow>=10.0.0
