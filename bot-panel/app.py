@@ -43,6 +43,10 @@ def create_app() -> Flask:
 
     init_db(app)
 
+    # Cargar variables guardadas en BD al entorno del proceso
+    with app.app_context():
+        _load_env_from_db()
+
     # CSRF
     CSRFProtect(app)
 
@@ -88,7 +92,59 @@ def create_app() -> Flask:
         return render_template("error.html", code=500, message="Error interno del servidor"), 500
 
     logger.info(f"Panel iniciado — http://0.0.0.0:{Config.PORT}")
+
+    # Auto-arrancar el bot si existe main.py
+    with app.app_context():
+        _autostart_bot()
+
     return app
+
+
+def _load_env_from_db():
+    """Carga variables de BD y config del bot en os.environ al iniciar."""
+    import os as _os
+    try:
+        from models.env_variable import EnvVariable
+        for v in EnvVariable.query.all():
+            if v.key and v.value:
+                _os.environ.setdefault(v.key, v.value)
+    except Exception:
+        pass
+    try:
+        from models.bot_config import BotConfig
+        cfg = BotConfig.query.first()
+        if cfg:
+            if cfg.token:
+                _os.environ.setdefault("BOT_TOKEN", cfg.token)
+            if cfg.client_id:
+                _os.environ.setdefault("DISCORD_CLIENT_ID", cfg.client_id)
+            if cfg.client_secret:
+                _os.environ.setdefault("DISCORD_CLIENT_SECRET", cfg.client_secret)
+            if cfg.prefix:
+                _os.environ.setdefault("BOT_PREFIX", cfg.prefix)
+    except Exception:
+        pass
+
+
+def _autostart_bot():
+    """Arranca el bot automáticamente si main.py existe Y BOT_TOKEN está configurado."""
+    import os as _os
+    try:
+        # Solo arrancar si hay token disponible
+        if not _os.environ.get("BOT_TOKEN"):
+            logging.getLogger("app").info(
+                "Bot no arrancado automáticamente — configura BOT_TOKEN en Ajustes o Variables."
+            )
+            return
+        from services import bot_manager
+        bot_files = _os.path.join(_os.path.dirname(__file__), "bot_files")
+        main_py = _os.path.join(bot_files, "main.py")
+        if _os.path.exists(main_py):
+            status = bot_manager.get_status()
+            if not status["running"]:
+                bot_manager.start_bot("bot_files/main.py")
+    except Exception:
+        pass
 
 
 app = create_app()

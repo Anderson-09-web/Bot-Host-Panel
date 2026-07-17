@@ -67,6 +67,7 @@ def api_write():
     data = request.get_json(silent=True) or {}
     rel = data.get("path", "")
     content = data.get("content", "")
+    restart = data.get("restart_bot", True)
     base = get_base()
     target = safe_path(base, rel)
     if not target:
@@ -75,7 +76,12 @@ def api_write():
         os.makedirs(os.path.dirname(target), exist_ok=True)
         with open(target, "w", encoding="utf-8") as f:
             f.write(content)
-        return jsonify({"success": True})
+        # Sync a R2
+        _sync_to_r2(target, rel)
+        # Reiniciar bot si es archivo Python del bot
+        if restart and rel.endswith(".py"):
+            _restart_bot_async()
+        return jsonify({"success": True, "restarted": restart and rel.endswith(".py")})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -106,9 +112,17 @@ def api_delete():
     if not target or target == base:
         return jsonify({"error": "Ruta inválida"}), 400
     try:
-        if os.path.isdir(target):
+        is_dir = os.path.isdir(target)
+        if is_dir:
+            # Borrar cada archivo de R2 antes de eliminar localmente
+            for root, dirs, files in os.walk(target):
+                for fname in files:
+                    fpath = os.path.join(root, fname)
+                    frel = os.path.relpath(fpath, base)
+                    _delete_from_r2(frel)
             shutil.rmtree(target)
         else:
+            _delete_from_r2(rel)
             os.remove(target)
         return jsonify({"success": True})
     except Exception as e:
@@ -205,7 +219,15 @@ def api_upload():
             extract_zip(dest, target_dir)
             os.remove(dest)
             uploaded.append(f"{filename} (extraído)")
+            # Sync todos los archivos extraídos a R2
+            for root, dirs, files_list in os.walk(target_dir):
+                for fname in files_list:
+                    fpath = os.path.join(root, fname)
+                    frel = os.path.relpath(fpath, get_base())
+                    _sync_to_r2(fpath, frel)
         else:
+            rel_dest = os.path.relpath(dest, get_base())
+            _sync_to_r2(dest, rel_dest)
             uploaded.append(filename)
 
     return jsonify({"success": True, "uploaded": uploaded})
@@ -247,6 +269,51 @@ def api_search():
         if len(results) >= 50:
             break
     return jsonify({"results": results})
+
+
+def _sync_to_r2(local_path: str, r2_key: str):
+    """Sube un archivo local a R2 en segundo plano (silencioso si no configurado)."""
+    try:
+        from services import r2_service
+        if not r2_service.is_configured():
+            return
+        import threading
+        # Normalizar key: quitar backslashes de Windows
+        key = r2_key.replace("\\", "/")
+        threading.Thread(
+            target=r2_service.upload_file,
+            args=(local_path, key),
+            daemon=True,
+        ).start()
+    except Exception:
+        pass
+
+
+def _delete_from_r2(r2_key: str):
+    """Elimina un objeto de R2 (silencioso si no configurado)."""
+    try:
+        from services import r2_service
+        if not r2_service.is_configured():
+            return
+        key = r2_key.replace("\\", "/")
+        r2_service.delete_file(key)
+    except Exception:
+        pass
+
+
+def _restart_bot_async():
+    """Reinicia el bot en un hilo aparte para no bloquear la respuesta."""
+    import threading
+    def _do():
+        import time
+        time.sleep(0.5)
+        try:
+            from services import bot_manager
+            if bot_manager.get_status()["running"]:
+                bot_manager.restart_bot()
+        except Exception:
+            pass
+    threading.Thread(target=_do, daemon=True).start()
 
 
 def _build_breadcrumbs(rel_path: str) -> list[dict]:

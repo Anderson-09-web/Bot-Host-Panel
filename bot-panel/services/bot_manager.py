@@ -47,9 +47,42 @@ def get_status() -> dict:
         }
 
 
-def start_bot(bot_script: str = "bot.py") -> dict:
+_BOT_SCRIPT = "bot_files/main.py"
+_watchdog_thread: threading.Thread | None = None
+
+
+def _watchdog(bot_script: str, started_at: float):
+    """Reinicia el bot si muere inesperadamente (modo 24/7).
+    Si el proceso dura menos de 15 s, asume error de config y no reinicia."""
+    global _process, _paused
+    time.sleep(8)  # espera inicial antes de monitorizar
+    while True:
+        time.sleep(5)
+        dead = False
+        with _lock:
+            if _process is None:
+                return  # detenido intencionalmente
+            if _process.poll() is not None and not _paused:
+                dead = True
+                _process = None
+
+        if dead:
+            uptime = time.time() - started_at
+            if uptime < 15:
+                logger.warning(
+                    "[BOT] El proceso terminó antes de 15 s — posible error de configuración. "
+                    "Configura BOT_TOKEN en Ajustes o Variables y pulsa ▶ Iniciar."
+                )
+                return  # no reiniciar, evitar bucle infinito
+            logger.warning("[BOT] El proceso terminó. Reiniciando en 5 s...")
+            time.sleep(5)
+            start_bot(bot_script)
+            return
+
+
+def start_bot(bot_script: str = _BOT_SCRIPT) -> dict:
     """Inicia el proceso del bot."""
-    global _process, _log_thread, _paused
+    global _process, _log_thread, _paused, _watchdog_thread
 
     with _lock:
         if _process and _process.poll() is None:
@@ -60,16 +93,24 @@ def start_bot(bot_script: str = "bot.py") -> dict:
             return {"success": False, "message": f"No se encontró {bot_script}"}
 
         try:
+            env = os.environ.copy()
             _process = subprocess.Popen(
                 [sys.executable, bot_path],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 cwd=os.path.dirname(bot_path),
-                env=os.environ.copy(),
+                env=env,
             )
             _paused = False
+            _started_at = time.time()
             _log_thread = threading.Thread(target=_stream_logs, args=(_process,), daemon=True)
             _log_thread.start()
+
+            # Watchdog 24/7
+            _watchdog_thread = threading.Thread(
+                target=_watchdog, args=(bot_script, _started_at), daemon=True
+            )
+            _watchdog_thread.start()
 
             update_bot_stats(running=True, status="online", pid=_process.pid)
             logger.info(f"Bot iniciado con PID {_process.pid}")
@@ -111,9 +152,9 @@ def resume_bot() -> dict:
             return {"success": False, "message": str(e)}
 
 
-def restart_bot(bot_script: str = "bot.py") -> dict:
+def restart_bot(bot_script: str = _BOT_SCRIPT) -> dict:
     """Detiene y reinicia el bot."""
-    stop_result = stop_bot()
+    stop_bot()
     time.sleep(1.5)
     return start_bot(bot_script)
 

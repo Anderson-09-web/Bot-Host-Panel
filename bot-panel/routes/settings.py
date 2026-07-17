@@ -57,6 +57,13 @@ def save_bot():
         cfg.intent_message_content = bool(data["intent_message_content"])
 
     db.session.commit()
+
+    # Inyectar en el proceso actual para efecto inmediato
+    if cfg.token:        os.environ["BOT_TOKEN"] = cfg.token
+    if cfg.client_id:    os.environ["DISCORD_CLIENT_ID"] = cfg.client_id
+    if cfg.client_secret: os.environ["DISCORD_CLIENT_SECRET"] = cfg.client_secret
+    if cfg.prefix:       os.environ["BOT_PREFIX"] = cfg.prefix
+
     logger.info("Configuración del bot actualizada.")
     return jsonify({"success": True, "message": "Configuración guardada."})
 
