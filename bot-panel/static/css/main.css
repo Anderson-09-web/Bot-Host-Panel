@@ -1108,8 +1108,9 @@ body {
 .vars-empty i { font-size: 32px; opacity: .4; }
 .vars-empty p { font-size: 13px; }
 
-/* ── Modal overlay base (oculto por defecto) ── */
-.modal-overlay { display: none; }
+/* ── Modal overlay — oculto por defecto, visible con .active ── */
+.modal-overlay        { display: none; }
+.modal-overlay.active { display: flex; }
 
 .modal-box {
   background: var(--bg-card);

@@ -168,7 +168,7 @@ async function openFile(path, name) {
     editingPath = path;
     document.getElementById('editorTitle').textContent = name;
     document.getElementById('codeEditor').value = r.content;
-    document.getElementById('editorModal').classList.remove('hidden');
+    document.getElementById('editorModal').classList.add('active');
 }
 
 async function saveFile() {
@@ -179,14 +179,14 @@ async function saveFile() {
 }
 
 function closeEditor() {
-    document.getElementById('editorModal')?.classList.add('hidden');
+    document.getElementById('editorModal')?.classList.remove('active');
     editingPath = null;
 }
 
 // ── Create Folder ────────────────────────────────
 function showCreateFolderModal() {
     document.getElementById('folderName').value = '';
-    document.getElementById('folderModal').classList.remove('hidden');
+    document.getElementById('folderModal').classList.add('active');
     document.getElementById('folderName').focus();
 }
 
@@ -202,7 +202,7 @@ async function createFolder() {
 // ── Create File ──────────────────────────────────
 function showCreateFileModal() {
     document.getElementById('newFileName').value = '';
-    document.getElementById('fileModal').classList.remove('hidden');
+    document.getElementById('fileModal').classList.add('active');
     document.getElementById('newFileName').focus();
 }
 
@@ -280,7 +280,7 @@ async function searchFiles(query) {
 
 // ── Modals ───────────────────────────────────────
 function closeModal(id) {
-    document.getElementById(id)?.classList.add('hidden');
+    document.getElementById(id)?.classList.remove('active');
 }
 
 // Keyboard shortcuts dentro de modales
